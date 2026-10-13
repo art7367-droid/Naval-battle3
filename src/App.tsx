@@ -1,10 +1,15 @@
 import { useState } from 'react';
 import ShipDatabaseManager from './components/ShipDatabaseManager';
+import ShipSelectionScreen from './components/ShipSelectionScreen';
+import BattleScreen from './components/BattleScreen';
+import { ShipDatabaseEntry } from './types/shipDatabase';
 
-type AppScreen = 'menu' | 'database';
+type AppScreen = 'menu' | 'database' | 'selection' | 'battle';
 
 export default function App() {
   const [screen, setScreen] = useState<AppScreen>('menu');
+  const [selectedPlayerShips, setSelectedPlayerShips] = useState<ShipDatabaseEntry[]>([]);
+  const [selectedEnemyShips, setSelectedEnemyShips] = useState<ShipDatabaseEntry[]>([]);
 
   if (screen === 'menu') {
     return (
@@ -16,7 +21,7 @@ export default function App() {
           </div>
           <div className="space-y-4">
             <button onClick={() => setScreen('database')} className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-bold text-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg">📚 База данных кораблей</button>
-            <button disabled className="w-full px-6 py-4 bg-gradient-to-r from-red-600 to-orange-600 rounded-lg font-bold text-lg opacity-50 cursor-not-allowed">⚔️ Начать бой (скоро)</button>
+            <button onClick={() => setScreen('selection')} className="w-full px-6 py-4 bg-gradient-to-r from-red-600 to-orange-600 rounded-lg font-bold text-lg hover:from-red-700 hover:to-orange-700 transition-all shadow-lg">⚔️ Начать бой</button>
           </div>
           <div className="mt-8 text-center text-sm text-slate-400">
             <p>Версия с базой данных кораблей и редактором отсеков</p>
@@ -37,6 +42,29 @@ export default function App() {
           <ShipDatabaseManager />
         </div>
       </div>
+    );
+  }
+
+  if (screen === 'selection') {
+    return (
+      <ShipSelectionScreen
+        onStartBattle={(playerShips, enemyShips) => {
+          setSelectedPlayerShips(playerShips);
+          setSelectedEnemyShips(enemyShips);
+          setScreen('battle');
+        }}
+        onBack={() => setScreen('menu')}
+      />
+    );
+  }
+
+  if (screen === 'battle') {
+    return (
+      <BattleScreen
+        playerShips={selectedPlayerShips}
+        enemyShips={selectedEnemyShips}
+        onBack={() => setScreen('selection')}
+      />
     );
   }
 
