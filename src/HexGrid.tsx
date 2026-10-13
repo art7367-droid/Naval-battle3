@@ -1,4 +1,4 @@
-import { Ship, GamePhase, BOARD_SIZE } from './types';
+import { Ship, GamePhase, Shot, Trajectory, BOARD_SIZE } from './types';
 import ShipSprite from './ShipSprite';
 
 interface HexGridProps {
@@ -7,13 +7,13 @@ interface HexGridProps {
   phase: GamePhase;
   selectedTarget?: { q: number; r: number } | null;
   shotTargets?: { shipId: number; targetQ: number; targetR: number }[];
-  shots?: any[];
-  enemyShots?: any[];
+  shots?: Shot[];
+  enemyShots?: Shot[];
   selectedShipForMove?: Ship | null;
   reachableHexes?: { q: number; r: number }[];
   attackingShip?: Ship | null;
-  playerTrajectories?: any[];
-  enemyTrajectories?: any[];
+  playerTrajectories?: Trajectory[];
+  enemyTrajectories?: Trajectory[];
   isAnimating?: boolean;
   onCellClick: (q: number, r: number) => void;
   onShipClick?: (ship: Ship) => void;
@@ -43,9 +43,8 @@ function getHexPosition(q: number, r: number, size: number) {
 
 export default function HexGrid({
   playerShips, enemyShips, phase, selectedTarget, selectedShipForMove,
-  reachableHexes = [], attackingShip, onCellClick, onShipClick,
-  shotTargets = [], shots = [], enemyShots = [],
-  playerTrajectories = [], enemyTrajectories = [], isAnimating = false,
+  reachableHexes = [], attackingShip, playerTrajectories = [], enemyTrajectories = [],
+  onCellClick, onShipClick,
 }: HexGridProps) {
   const width = BOARD_SIZE * (Math.sqrt(3) * HEX_SIZE) + HEX_SIZE * 2;
   const height = BOARD_SIZE * (HEX_SIZE * 1.5) + HEX_SIZE * 2;
