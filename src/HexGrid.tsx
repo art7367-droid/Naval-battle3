@@ -84,6 +84,48 @@ export default function HexGrid({
           })
         )}
 
+        {/* Отрисовка траекторий кораблей игрока */}
+        {playerTrajectories.map((trajectory, idx) => {
+          if (!trajectory.path || trajectory.path.length < 2) return null;
+          const points = trajectory.path.map((p: any) => {
+            const pos = getHexPosition(p.q, p.r, HEX_SIZE);
+            return `${pos.x},${pos.y}`;
+          }).join(' ');
+          return (
+            <polyline
+              key={`player-traj-${idx}`}
+              points={points}
+              fill="none"
+              stroke="#3b82f6"
+              strokeWidth="2"
+              strokeDasharray="5,5"
+              opacity="0.6"
+              style={{ pointerEvents: 'none' }}
+            />
+          );
+        })}
+
+        {/* Отрисовка траекторий кораблей противника */}
+        {enemyTrajectories.map((trajectory, idx) => {
+          if (!trajectory.path || trajectory.path.length < 2) return null;
+          const points = trajectory.path.map((p: any) => {
+            const pos = getHexPosition(p.q, p.r, HEX_SIZE);
+            return `${pos.x},${pos.y}`;
+          }).join(' ');
+          return (
+            <polyline
+              key={`enemy-traj-${idx}`}
+              points={points}
+              fill="none"
+              stroke="#ef4444"
+              strokeWidth="2"
+              strokeDasharray="5,5"
+              opacity="0.6"
+              style={{ pointerEvents: 'none' }}
+            />
+          );
+        })}
+
         {playerShips.filter(s => s.currentHP > 0).map(ship => {
           const pos = getHexPosition(ship.q, ship.r, HEX_SIZE);
           const isSelected = selectedShipForMove?.id === ship.id;
