@@ -1,4 +1,4 @@
-import { Ship, GamePhase, Shot, Trajectory, BOARD_SIZE } from './types';
+import { Ship, GamePhase, BOARD_SIZE } from './types';
 import ShipSprite from './ShipSprite';
 
 interface HexGridProps {
@@ -7,13 +7,13 @@ interface HexGridProps {
   phase: GamePhase;
   selectedTarget?: { q: number; r: number } | null;
   shotTargets?: { shipId: number; targetQ: number; targetR: number }[];
-  shots?: Shot[];
-  enemyShots?: Shot[];
+  shots?: any[];
+  enemyShots?: any[];
   selectedShipForMove?: Ship | null;
   reachableHexes?: { q: number; r: number }[];
   attackingShip?: Ship | null;
-  playerTrajectories?: Trajectory[];
-  enemyTrajectories?: Trajectory[];
+  playerTrajectories?: any[];
+  enemyTrajectories?: any[];
   isAnimating?: boolean;
   onCellClick: (q: number, r: number) => void;
   onShipClick?: (ship: Ship) => void;
@@ -43,8 +43,9 @@ function getHexPosition(q: number, r: number, size: number) {
 
 export default function HexGrid({
   playerShips, enemyShips, phase, selectedTarget, selectedShipForMove,
-  reachableHexes = [], attackingShip, playerTrajectories = [], enemyTrajectories = [],
-  onCellClick, onShipClick,
+  reachableHexes = [], attackingShip, onCellClick, onShipClick,
+  shotTargets = [], shots = [], enemyShots = [],
+  playerTrajectories = [], enemyTrajectories = [], isAnimating = false,
 }: HexGridProps) {
   const width = BOARD_SIZE * (Math.sqrt(3) * HEX_SIZE) + HEX_SIZE * 2;
   const height = BOARD_SIZE * (HEX_SIZE * 1.5) + HEX_SIZE * 2;
@@ -82,22 +83,6 @@ export default function HexGrid({
             );
           })
         )}
-
-        {playerTrajectories.map((trajectory, idx) => {
-          if (trajectory.path.length < 2) return null;
-          const startPos = getHexPosition(trajectory.path[0].q, trajectory.path[0].r, HEX_SIZE);
-          const endPos = getHexPosition(trajectory.path[trajectory.path.length - 1].q, trajectory.path[trajectory.path.length - 1].r, HEX_SIZE);
-          return (<line key={`player-traj-${idx}`} x1={startPos.x} y1={startPos.y} x2={endPos.x} y2={endPos.y}
-            stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" opacity="0.6" style={{ pointerEvents: 'none' }} />);
-        })}
-
-        {enemyTrajectories.map((trajectory, idx) => {
-          if (trajectory.path.length < 2) return null;
-          const startPos = getHexPosition(trajectory.path[0].q, trajectory.path[0].r, HEX_SIZE);
-          const endPos = getHexPosition(trajectory.path[trajectory.path.length - 1].q, trajectory.path[trajectory.path.length - 1].r, HEX_SIZE);
-          return (<line key={`enemy-traj-${idx}`} x1={startPos.x} y1={startPos.y} x2={endPos.x} y2={endPos.y}
-            stroke="#ef4444" strokeWidth="2" strokeDasharray="5,5" opacity="0.6" style={{ pointerEvents: 'none' }} />);
-        })}
 
         {playerShips.filter(s => s.currentHP > 0).map(ship => {
           const pos = getHexPosition(ship.q, ship.r, HEX_SIZE);

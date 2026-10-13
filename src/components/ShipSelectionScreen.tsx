@@ -13,7 +13,10 @@ export default function ShipSelectionScreen({ onStartBattle }: ShipSelectionScre
   const [selectedEnemyShips, setSelectedEnemyShips] = useState<ShipDatabaseEntry[]>([]);
   const [viewingShip, setViewingShip] = useState<ShipDatabaseEntry | null>(null);
 
-  useEffect(() => { const db = loadDatabase(); setShips(db.ships); }, []);
+  useEffect(() => {
+    const db = loadDatabase();
+    setShips(db.ships);
+  }, []);
 
   const randomSelectFleet = (excludeIds: string[] = []): ShipDatabaseEntry[] => {
     const available = ships.filter(s => !excludeIds.includes(s.id));
@@ -31,24 +34,43 @@ export default function ShipSelectionScreen({ onStartBattle }: ShipSelectionScre
     const playerFleet = randomSelectFleet();
     const playerIds = playerFleet.map(s => s.id);
     const enemyFleet = randomSelectFleet(playerIds);
-    setSelectedPlayerShips(playerFleet); setSelectedEnemyShips(enemyFleet);
+    setSelectedPlayerShips(playerFleet);
+    setSelectedEnemyShips(enemyFleet);
   };
 
-  const handleRandomPlayer = () => { const enemyIds = selectedEnemyShips.map(s => s.id); setSelectedPlayerShips(randomSelectFleet(enemyIds)); };
-  const handleRandomEnemy = () => { const playerIds = selectedPlayerShips.map(s => s.id); setSelectedEnemyShips(randomSelectFleet(playerIds)); };
+  const handleRandomPlayer = () => {
+    const enemyIds = selectedEnemyShips.map(s => s.id);
+    const playerFleet = randomSelectFleet(enemyIds);
+    setSelectedPlayerShips(playerFleet);
+  };
+
+  const handleRandomEnemy = () => {
+    const playerIds = selectedPlayerShips.map(s => s.id);
+    const enemyFleet = randomSelectFleet(playerIds);
+    setSelectedEnemyShips(enemyFleet);
+  };
 
   const togglePlayerShip = (ship: ShipDatabaseEntry) => {
-    if (selectedPlayerShips.find(s => s.id === ship.id)) setSelectedPlayerShips(selectedPlayerShips.filter(s => s.id !== ship.id));
-    else setSelectedPlayerShips([...selectedPlayerShips, ship]);
+    if (selectedPlayerShips.find(s => s.id === ship.id)) {
+      setSelectedPlayerShips(selectedPlayerShips.filter(s => s.id !== ship.id));
+    } else {
+      setSelectedPlayerShips([...selectedPlayerShips, ship]);
+    }
   };
 
   const toggleEnemyShip = (ship: ShipDatabaseEntry) => {
-    if (selectedEnemyShips.find(s => s.id === ship.id)) setSelectedEnemyShips(selectedEnemyShips.filter(s => s.id !== ship.id));
-    else setSelectedEnemyShips([...selectedEnemyShips, ship]);
+    if (selectedEnemyShips.find(s => s.id === ship.id)) {
+      setSelectedEnemyShips(selectedEnemyShips.filter(s => s.id !== ship.id));
+    } else {
+      setSelectedEnemyShips([...selectedEnemyShips, ship]);
+    }
   };
 
   const handleStart = () => {
-    if (selectedPlayerShips.length === 0 || selectedEnemyShips.length === 0) { alert('Выберите хотя бы один корабль для каждой стороны!'); return; }
+    if (selectedPlayerShips.length === 0 || selectedEnemyShips.length === 0) {
+      alert('Выберите хотя бы один корабль для каждой стороны!');
+      return;
+    }
     onStartBattle(selectedPlayerShips, selectedEnemyShips);
   };
 
@@ -64,7 +86,11 @@ export default function ShipSelectionScreen({ onStartBattle }: ShipSelectionScre
           </div>
         )}
         {ships.length === 0 ? (
-          <div className="text-center py-12"><div className="text-6xl mb-4">📚</div><div className="text-xl text-slate-400 mb-2">База данных пуста</div><div className="text-sm text-slate-500">Сначала добавьте корабли в базу данных</div></div>
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">📚</div>
+            <div className="text-xl text-slate-400 mb-2">База данных пуста</div>
+            <div className="text-sm text-slate-500">Сначала добавьте корабли в базу данных</div>
+          </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="bg-slate-800/50 rounded-lg p-4 border border-cyan-600">
@@ -72,10 +98,13 @@ export default function ShipSelectionScreen({ onStartBattle }: ShipSelectionScre
               <div className="space-y-2 max-h-[400px] overflow-y-auto">
                 {selectedPlayerShips.map(ship => (
                   <div key={ship.id} className="p-2 bg-cyan-900/30 border border-cyan-500 rounded cursor-pointer" onClick={() => togglePlayerShip(ship)}>
-                    <div className="font-semibold">{ship.name}</div><div className="text-xs text-slate-400">{ship.class} • {ship.country}</div>
+                    <div className="font-semibold">{ship.name}</div>
+                    <div className="text-xs text-slate-400">{ship.class} • {ship.country}</div>
                   </div>
                 ))}
-                {selectedPlayerShips.length === 0 && <div className="text-center text-slate-500 py-4 text-sm">Выберите корабли из списка</div>}
+                {selectedPlayerShips.length === 0 && (
+                  <div className="text-center text-slate-500 py-4 text-sm">Выберите корабли из списка</div>
+                )}
               </div>
             </div>
             <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-600">
@@ -87,7 +116,11 @@ export default function ShipSelectionScreen({ onStartBattle }: ShipSelectionScre
                   return (
                     <div key={ship.id} className={`p-2 rounded border ${isPlayerSelected ? 'bg-cyan-900/30 border-cyan-500' : isEnemySelected ? 'bg-red-900/30 border-red-500' : 'bg-slate-900/50 border-slate-700 hover:bg-slate-800/50'}`}>
                       <div className="flex justify-between items-start">
-                        <div><div className="font-semibold text-sm">{ship.name}</div><div className="text-xs text-slate-400">{ship.class} • {ship.country} • {ship.year}</div><div className="text-xs text-slate-500 mb-2">HP: {ship.maxHP} | Скорость: {ship.speed} | Дальность: {ship.range}</div></div>
+                        <div>
+                          <div className="font-semibold text-sm">{ship.name}</div>
+                          <div className="text-xs text-slate-400">{ship.class} • {ship.country} • {ship.year}</div>
+                          <div className="text-xs text-slate-500 mb-2">HP: {ship.maxHP} | Скорость: {ship.speed} | Дальность: {ship.range}</div>
+                        </div>
                         <button onClick={() => setViewingShip(ship)} className="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs" title="Показать ТТХ">📋</button>
                       </div>
                       <div className="flex gap-1">
@@ -104,10 +137,13 @@ export default function ShipSelectionScreen({ onStartBattle }: ShipSelectionScre
               <div className="space-y-2 max-h-[400px] overflow-y-auto">
                 {selectedEnemyShips.map(ship => (
                   <div key={ship.id} className="p-2 bg-red-900/30 border border-red-500 rounded cursor-pointer" onClick={() => toggleEnemyShip(ship)}>
-                    <div className="font-semibold">{ship.name}</div><div className="text-xs text-slate-400">{ship.class} • {ship.country}</div>
+                    <div className="font-semibold">{ship.name}</div>
+                    <div className="text-xs text-slate-400">{ship.class} • {ship.country}</div>
                   </div>
                 ))}
-                {selectedEnemyShips.length === 0 && <div className="text-center text-slate-500 py-4 text-sm">Выберите корабли из списка</div>}
+                {selectedEnemyShips.length === 0 && (
+                  <div className="text-center text-slate-500 py-4 text-sm">Выберите корабли из списка</div>
+                )}
               </div>
             </div>
           </div>
